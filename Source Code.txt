@@ -1,0 +1,98 @@
+#1.
+
+for i in df[df.FlightNumber.isnull()==True].index:
+    df.FlightNumber[i]=df.FlightNumber[i-1]+10;
+print(df.FlightNumber.astype(int));
+
+'''
+OUTPUT
+---------------------------------------------------
+0    10045
+1    10055
+2    10065
+3    10075
+4    10085
+Name: FlightNumber, dtype: int32
+'''
+
+#2
+df[['From','To']]=df.From_To.str.split('_',expand=True)
+df
+
+
+'''
+OUTPUT
+---------------------------------------------------
+Airline 	FlightNumber 	From_To 	RecentDelays 	From 	To
+0 	KLM(!) 	10045.0 	LoNDon_paris 	[23, 47] 	LoNDon 	paris
+1 	<Air France> (12) 	10055.0 	MAdrid_miLAN 	[] 	MAdrid 	miLAN
+2 	(British Airways. ) 	10065.0 	londON_StockhOlm 	[24, 43, 87] 	londON 	StockhOlm
+3 	12. Air France 	10075.0 	Budapest_PaRis 	[13] 	Budapest 	PaRis
+4 	"Swiss Air" 	10085.0 	Brussels_londOn 	[67, 32] 	Brussels 	londOn
+
+'''
+
+#3
+df['From']=df['From'].str.capitalize()
+df['To']=df['To'].str.capitalize()
+df
+
+
+'''
+OUTPUT
+---------------------------------------------------
+
+Airline 	FlightNumber 	From_To 	RecentDelays 	From 	To
+0 	KLM(!) 	10045.0 	LoNDon_paris 	[23, 47] 	London 	Paris
+1 	<Air France> (12) 	10055.0 	MAdrid_miLAN 	[] 	Madrid 	Milan
+2 	(British Airways. ) 	10065.0 	londON_StockhOlm 	[24, 43, 87] 	London 	Stockholm
+3 	12. Air France 	10075.0 	Budapest_PaRis 	[13] 	Budapest 	Paris
+4 	"Swiss Air" 	10085.0 	Brussels_londOn 	[67, 32] 	Brussels 	London
+
+'''
+
+
+#4
+df.drop(columns=['From_To'],inplace=True)
+
+
+df
+
+
+'''
+OUTPUT
+---------------------------------------------------
+
+
+
+	Airline 	FlightNumber 	RecentDelays 	From 	To
+0 	KLM(!) 	10045.0 	[23, 47] 	LoNDon 	paris
+1 	<Air France> (12) 	10055.0 	[] 	MAdrid 	miLAN
+2 	(British Airways. ) 	10065.0 	[24, 43, 87] 	londON 	StockhOlm
+3 	12. Air France 	10075.0 	[13] 	Budapest 	PaRis
+4 	"Swiss Air" 	10085.0 	[67, 32] 	Brussels 	londOn
+
+
+'''
+
+
+#5
+df1=df.RecentDelays.apply(pd.Series)
+df1.rename(columns={0:'delay_1',1:'delay_2',2:'delay_3'},inplace=True)
+df.drop(columns='RecentDelays',inplace=True)
+df.join(df1,how='inner')
+
+'''
+OUTPUT
+---------------------------------------------------
+
+
+Airline 	FlightNumber 	From 	To 	delay_1 	delay_2 	delay_3
+0 	KLM(!) 	10045.0 	LoNDon 	paris 	23.0 	47.0 	NaN
+1 	<Air France> (12) 	10055.0 	MAdrid 	miLAN 	NaN 	NaN 	NaN
+2 	(British Airways. ) 	10065.0 	londON 	StockhOlm 	24.0 	43.0 	87.0
+3 	12. Air France 	10075.0 	Budapest 	PaRis 	13.0 	NaN 	NaN
+4 	"Swiss Air" 	10085.0 	Brussels 	londOn 	67.0 	32.0 	Na
+
+
+'''
